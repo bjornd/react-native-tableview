@@ -593,6 +593,32 @@ RCT_NOT_IMPLEMENTED(-initWithCoder:(NSCoder *)aDecoder)
     }
 }
 
+-(NSArray *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSMutableArray *actions = [[NSMutableArray alloc] init];
+    for (int i=0;i<[_editActions count];i++){
+        NSString *title = _editActions[i][@"title"];
+        UITableViewRowAction *editAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:title handler:^(UITableViewRowAction *action, NSIndexPath *indexPath){
+            NSMutableDictionary *newValue = [self dataForRow:indexPath.item section:indexPath.section];
+            newValue[@"target"] = self.reactTag;
+            newValue[@"selectedIndex"] = [NSNumber numberWithInteger:indexPath.item];
+            newValue[@"selectedSection"] = [NSNumber numberWithInteger:indexPath.section];
+            newValue[@"mode"] = _editActions[i][@"action"];
+            [_eventDispatcher sendInputEventWithName:@"change" body:newValue];
+        }];
+        editAction.backgroundColor = [RNTableView colorFromHexString:_editActions[i][@"color"]];
+        [actions addObject:editAction];
+    }
+    return [actions copy];
+}
+
++(UIColor *)colorFromHexString:(NSString *)hexString {
+    unsigned rgbValue = 0;
+    NSScanner *scanner = [NSScanner scannerWithString:hexString];
+    [scanner setScanLocation:1];
+    [scanner scanHexInt:&rgbValue];
+    return [UIColor colorWithRed:((rgbValue & 0xFF0000) >> 16)/255.0 green:((rgbValue & 0xFF00) >> 8)/255.0 blue:(rgbValue & 0xFF)/255.0 alpha:1.0];
+}
+
 -(UITableViewCellEditingStyle)tableView:(UITableView *)tableView
           editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath{
     return self.tableViewCellEditingStyle;

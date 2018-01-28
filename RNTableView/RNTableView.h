@@ -45,6 +45,7 @@
 @property(nonatomic, assign) BOOL showsVerticalScrollIndicator;
 @property(nonatomic, assign) BOOL canRefresh;
 @property(nonatomic, assign) BOOL refreshing;
+@property (nonatomic, copy) NSArray *editActions;
 
 @property(nonatomic, assign) UITableViewStyle tableViewStyle;
 @property(nonatomic, assign) UITableViewCellStyle tableViewCellStyle;
